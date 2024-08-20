@@ -9,7 +9,7 @@
 # Hello, this is Chess Unbound, a chess game on PythonXPygame, made by LolosharaGd, it is open source, and you can add anything you want to the code,
 # New pieces, new modes, anything and publish it. The only thing you need to do - credit me and original (this) project
 #
-# Here in the list, I will list mods for this project (where you added something)
+# Here is the list where I will list mods for this project (where you added something)
 # If you made a mod and I haven't listed it here (because I haven't saw it or for other reasons), send it in the comments
 #
 mods_list = ["It is empty right now, but you can fix it :>"]
@@ -18,6 +18,7 @@ mods_list = ["It is empty right now, but you can fix it :>"]
 #
 
 import pygame as pg
+import sys
 
 pg.font.init()
 
@@ -97,7 +98,7 @@ class Game:
 
             for e in pg.event.get():
                 if e.type == pg.QUIT:
-                    quit()
+                    sys.exit()
 
                 elif e.type == pg.MOUSEMOTION:
                     self.mouse_pos = e.pos
@@ -167,32 +168,42 @@ class Game:
                                                         self.attacked_cells[self.selected_piece[1] + offset[1]][self.selected_piece[0] + offset[0]] = 1
                                         elif self.selected_piece_type.lower() == "k":  # If a piece type is "k"
                                             # Check for available castling
-                                            if self.castles[0]:  # If w-k castle is available
-                                                if self.pieces[7][4] == "k" and \
-                                                        self.pieces[7][5] == "" and \
-                                                        self.pieces[7][6] == "" and \
-                                                        self.pieces[7][7] == "r":  # If every piece is on its place
-                                                    self.attacked_cells[7][6] = 1  # Select castling square
-                                            if self.castles[1]:  # If w-q castle is available
-                                                if self.pieces[7][4] == "k" and \
-                                                        self.pieces[7][3] == "" and \
-                                                        self.pieces[7][2] == "" and \
-                                                        self.pieces[7][1] == "" and \
-                                                        self.pieces[7][0] == "r":  # If every piece is on its place
-                                                    self.attacked_cells[7][2] = 1  # Select castling square
-                                            if self.castles[2]:  # If b-k castle is available
-                                                if self.pieces[0][4] == "K" and \
-                                                        self.pieces[0][5] == "" and \
-                                                        self.pieces[0][6] == "" and \
-                                                        self.pieces[0][7] == "R":  # If every piece is on its place
-                                                    self.attacked_cells[0][6] = 1  # Select castling square
-                                            if self.castles[3]:  # If b-q castle is available
-                                                if self.pieces[0][4] == "K" and \
-                                                        self.pieces[0][3] == "" and \
-                                                        self.pieces[0][2] == "" and \
-                                                        self.pieces[0][1] == "" and \
-                                                        self.pieces[0][0] == "R":  # If every piece is on its place
-                                                    self.attacked_cells[0][2] = 1  # Select castling square
+                                            if self.selected_piece_type == "k":  # If you selected white king
+                                                if self.castles[0]:  # If w-k castle is available
+                                                    if self.pieces[7][4] == "k" and \
+                                                            self.pieces[7][5] == "" and \
+                                                            self.pieces[7][6] == "" and \
+                                                            self.pieces[7][7] == "r":  # If every piece is on its place
+                                                        if not self.checks_enabled or \
+                                                                (self.attacked_cells_b_black[7][4] + self.attacked_cells_b_black[7][5] == 0):  # If all rules of castling are observed
+                                                            self.attacked_cells[7][6] = 1  # Select castling square
+                                                if self.castles[1]:  # If w-q castle is available
+                                                    if self.pieces[7][4] == "k" and \
+                                                            self.pieces[7][3] == "" and \
+                                                            self.pieces[7][2] == "" and \
+                                                            self.pieces[7][1] == "" and \
+                                                            self.pieces[7][0] == "r":  # If every piece is on its place
+                                                        if not self.checks_enabled or \
+                                                                (self.attacked_cells_b_black[7][4] + self.attacked_cells_b_black[7][3] == 0):  # If all rules of castling are observed
+                                                            self.attacked_cells[7][2] = 1  # Select castling square
+                                            else:  # If you selected black king
+                                                if self.castles[2]:  # If b-k castle is available
+                                                    if self.pieces[0][4] == "K" and \
+                                                            self.pieces[0][5] == "" and \
+                                                            self.pieces[0][6] == "" and \
+                                                            self.pieces[0][7] == "R":  # If every piece is on its place
+                                                        if not self.checks_enabled or \
+                                                                (self.attacked_cells_b_white[0][4] + self.attacked_cells_b_white[0][5] == 0):  # If all rules of castling are observed
+                                                            self.attacked_cells[0][6] = 1  # Select castling square
+                                                if self.castles[3]:  # If b-q castle is available
+                                                    if self.pieces[0][4] == "K" and \
+                                                            self.pieces[0][3] == "" and \
+                                                            self.pieces[0][2] == "" and \
+                                                            self.pieces[0][1] == "" and \
+                                                            self.pieces[0][0] == "R":  # If every piece is on its place
+                                                        if not self.checks_enabled or \
+                                                                (self.attacked_cells_b_white[0][4] + self.attacked_cells_b_white[0][3] == 0):  # If all rules of castling are observed
+                                                            self.attacked_cells[0][2] = 1  # Select castling square
                                             # In the list of offsets, check if offset cell is valid, and if it is, set value in corresponding cell in attacked cells list to 1
                                             for offset in [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]]:
                                                 atk_x = self.selected_piece[0] + offset[0]
@@ -531,14 +542,15 @@ class Game:
                                                         atk_x = x + offset[0]
                                                         atk_y = y + offset[1]
 
-                                # Check if this move puts you in check
-                                for x in range(8):
-                                    for y in range(8):
-                                        if self.pieces[y][x] == "K" and self.attacked_cells_b_white[y][x] and self.white_turn:  # If black made a turn that put them in check
-                                            self.undo()
+                                # Check if this move puts you in check and checks are enabled, also if taking turns is enabled
+                                if self.take_turns and self.checks_enabled:
+                                    for x in range(8):
+                                        for y in range(8):
+                                            if self.pieces[y][x] == "K" and self.attacked_cells_b_white[y][x] and self.white_turn:  # If black made a turn that put them in check
+                                                self.undo()
 
-                                        if self.pieces[y][x] == "k" and self.attacked_cells_b_black[y][x] and not self.white_turn:  # If white made a turn that put them in check
-                                            self.undo()
+                                            if self.pieces[y][x] == "k" and self.attacked_cells_b_black[y][x] and not self.white_turn:  # If white made a turn that put them in check
+                                                self.undo()
 
                         else:  # If click is out of board bounds
                             if self.is_in_matrix(e.pos[0] - 940, e.pos[1] - 90, 70, 70):  # If click in bounds of undo button
@@ -577,6 +589,8 @@ class Game:
                                 # Renew lists of attacked cells
                                 self.attacked_cells_b_white = [[0 for x in range(8)] for y in range(8)]
                                 self.attacked_cells_b_black = [[0 for x in range(8)] for y in range(8)]
+                            elif self.is_in_matrix(e.pos[0] - 1450, e.pos[1], 50, 50):  # If click in bounds of quit button
+                                sys.exit()
 
             # Board rectangle, then loop drawing black squares
             pg.draw.rect(self.dis, (200, 200, 200), (100, 100, 800, 800))
@@ -863,6 +877,12 @@ class Game:
             self.dis.blit(self.main_font.render("Reset", False, (0, 0, 0)), (1025, 780))
             #
 
+            # Quit button
+            pg.draw.rect(self.dis, (255, 0, 0), (1450, 0, 50, 50))
+            pg.draw.line(self.dis, (0, 0, 0), (1465, 10), (1485, 40), 15)
+            pg.draw.line(self.dis, (0, 0, 0), (1485, 10), (1465, 40), 15)
+            #
+
             self.clock.tick(self.fps)
             pg.display.set_caption(f"Chess Unbound | FPS:{self.clock.get_fps():.2f}")
             pg.display.flip()
@@ -896,6 +916,5 @@ class Game:
             self.moves_history.pop()
 
 
-if __name__ == "__main__":
-    game = Game(1500, 1000, 60)
-    game.run()
+game = Game(1500, 1000, 60)
+game.run()
