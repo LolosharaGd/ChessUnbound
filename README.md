@@ -7,4 +7,6 @@ New pieces, new modes, anything and publish it. The only thing you need to do - 
 In code there is a list, where I will list mods for this project (where you added something)
 If you made a mod and I haven't listed it in list (because I haven't saw it or for other reasons), send it to me
 
-## If you are making a mod, you can replace this line with "Chess Unbound mod \<ModName\> made by \<YourUsername\>" or something like that
+### If you are making a mod, you can replace this line with "Chess Unbound mod \<ModName\> made by \<YourUsername\>" or something like that
+
+## To download this game to play, download main.exe and run it, to modify source code, download main.py, you need python and pygame installed to modify code
